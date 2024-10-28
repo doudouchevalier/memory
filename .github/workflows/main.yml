@@ -27,6 +27,7 @@ jobs:
           else
             echo "Aucun changement à committer"
           fi
+
   build-memory:
     runs-on: [self-hosted, linux, x64]
     needs: test-memory
