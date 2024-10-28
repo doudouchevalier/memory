@@ -14,7 +14,7 @@ jobs:
 
       - name: Verif fichier jpg
         run: |
-          IMG_REPLACEMENT="home/edouard/anthony.jpeg"    # cherche l'image de remplacement
+          IMG_REPLACEMENT="anthony.jpeg"    # cherche l'image de remplacement
           for file in $(find . -name '*.jpg'); do
             echo "Vérification de $file"
             if ! file "$file" | grep -q 'JPEG'; then
