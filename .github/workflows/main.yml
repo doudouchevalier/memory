@@ -7,19 +7,23 @@ on:
 jobs:
   test-memory:
     runs-on: [self-hosted, linux, x64]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Verif fichier jpg
         run: |
-          IMG_REPLACEMENT="../../anthony.jpeg"    #cherche l'image de remplacement
-          for file in $(find . -name '*.jpg'); do    #trouve et verifie les fich>           echo "Vérification de $file"
+          IMG_REPLACEMENT="../../anthony.jpeg"    # cherche l'image de remplacement
+          for file in $(find . -name '*.jpg'); do
+            echo "Vérification de $file"
             if ! file "$file" | grep -q 'JPEG'; then
               echo "$file est corrompu. Remplacement..."
-              cp "$IMG_REPLACEMENT" "$file"    #remplace si corrompu
+              cp "$IMG_REPLACEMENT" "$file"    # remplace si corrompu
             fi
           done
-      - name: commit change
+
+      - name: Commit changes
         run: |
           git add .
           if ! git diff --cached --quiet; then
@@ -41,23 +45,8 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t doudouchevalier/memory:latest .
-    - name: Verif fichier jpg
-      run: |
-        IMG_REPLACEMENT="/home/user/memory_lozano/img_st.jpg"    #cherche l'image de remplacement
-        for file in $(find . -name '*.jpg'); do    #trouve et verifie les fich>           echo "Vérification de $file"
-          if ! file "$file" | grep -q 'JPEG'; then
-            echo "$file est corrompu. Remplacement..."
-            cp "$IMG_REPLACEMENT" "$file"    #remplace si corrompu
-          fi
-        done
-    - name: commit change
-      run: |
-        git add .
-        if ! git diff --cached --quiet; then
-          git commit -m "Remplacement des fichiers JPEG corrompus"
-        else
-          echo "Aucun changement à committer"
-        fi  push-memory:
+
+  push-memory:
     runs-on: [self-hosted, linux, x64]
     needs: build-memory
 
@@ -74,8 +63,6 @@ jobs:
       - name: Push Docker image
         run: docker push doudouchevalier/memory:latest
 
-
-
   deploy-memory:
     runs-on: [self-hosted, linux, x64]
     needs: push-memory
@@ -89,7 +76,8 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
-          password: ${{ secrets.SSH_KEY }}
+          key: ${{ secrets.SSH_KEY }}
           script: |
             docker pull doudouchevalier/memory:latest
             docker run -d -p 80:80 doudouchevalier/memory:latest
+
